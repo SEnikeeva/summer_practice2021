@@ -9,12 +9,6 @@ def read_config(config_path_):
     return conf_data_
 
 
-def change_offset(config_path_, conf_data_, new_offset_):
-    conf_data_['offset'] = new_offset_
-    with open(config_path_, 'w') as f:
-        json.dump(conf_data_, f, indent=4)
-
-
 def send_weather(msg):
     # get coords
     if msg['message'].get('location') is not None:
@@ -66,20 +60,20 @@ def send_answer(msg):
 
 
 if __name__ == '__main__':
+    # read configs
+    offset = None
+
+    config_path = '../config.json'
+    conf_data = read_config(config_path)
+    tg_token = conf_data['tg_token']
+    weather_key = conf_data['weather_key']
+    geocode_key = conf_data['geocode_key']
+    geocode_token = conf_data['geocode_token']
+
+    geocode_request = create_geocode_req(geocode_key, geocode_token)
+    tg_url = 'https://api.telegram.org/bot{token}/{method}'
+    weather_url = 'https://api.openweathermap.org/data/2.5/weather'
     while True:
-        # read configs
-        config_path = 'config.json'
-        conf_data = read_config(config_path)
-        offset = conf_data['offset']
-        tg_token = conf_data['tg_token']
-        weather_key = conf_data['weather_key']
-        geocode_key = conf_data['geocode_key']
-        geocode_token = conf_data['geocode_token']
-
-        geocode_request = create_geocode_req(geocode_key, geocode_token)
-        tg_url = 'https://api.telegram.org/bot{token}/{method}'
-        weather_url = 'https://api.openweathermap.org/data/2.5/weather'
-
         if offset is None:
             tg_update_url = tg_url.format(token=tg_token, method='getUpdates')
         else:
@@ -91,6 +85,5 @@ if __name__ == '__main__':
 
         # set new offset
         if len(updates) > 0:
-            new_offset = updates[-1]['update_id'] + 1
-            change_offset(config_path, conf_data, new_offset)
+            offset = updates[-1]['update_id'] + 1
         time.sleep(10)
