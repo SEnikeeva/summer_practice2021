@@ -30,7 +30,10 @@ def send_weather(msg):
             'lang': 'ru'}).text)
     # send answer
     if weather_resp.get('main') is not None:
-        text = weather_resp['main']['temp']
+        text = f"Температура: {weather_resp['main']['temp']}" \
+               f"\nОщущается как: {weather_resp['main']['feels_like']}\n"
+        for w in weather_resp['weather']:
+            text += f"{w['description']}\n"
     else:
         text = 'Write address or send location'
     requests.post(
@@ -63,7 +66,7 @@ if __name__ == '__main__':
     # read configs
     offset = None
 
-    config_path = '../config.json'
+    config_path = 'config.json'
     conf_data = read_config(config_path)
     tg_token = conf_data['tg_token']
     weather_key = conf_data['weather_key']
