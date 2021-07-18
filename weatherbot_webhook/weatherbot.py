@@ -2,9 +2,8 @@ import json
 import requests
 import os
 
-
 """
-Обработчик запросов к telegram-bot @cloud_practice21_bot посредством webhook
+Обработчик запросов к telegram-bot @cloud_practice_bot посредством webhook
 """
 
 
